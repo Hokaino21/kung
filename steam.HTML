@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam-like Game Dashboard</title>
+    <style>
+        /* CSS Reset dan Variabel */
+        :root {
+            --primary: #1b2838;
+            --secondary: #171a21;
+            --accent: #66c0f4;
+            --text-primary: #c6d4df;
+            --text-secondary: #8f98a0;
+            --button-green: #5ba32b;
+            --button-green-hover: #6bc435;
+            --button-blue: #4f6b93;
+            --button-blue-hover: #567cac;
+            --header-height: 104px;
+            --nav-width: 210px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary);
+            color: var(--text-primary);
+        }
+
+        /* Layout Utama */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            height: var(--header-height);
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--primary) 100%);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 15px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: normal;
+            color: var(--accent);
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            background-color: #316282;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .search-bar input::placeholder {
+            color: #a3d3f5;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3d3f5;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .username {
+            font-size: 14px;
+            margin-right: 15px;
+        }
+
+        .wallet {
+            background-color: rgba(103, 193, 245, 0.2);
+            padding: 5px 10px;
+            border-radius: 2px;
+            font-size: 14px;
+            margin-right: 15px;
+        }
+
+        /* Sidebar Navigasi */
+        .sidebar {
+            width: var(--nav-width);
+            background-color: var(--secondary);
+            padding-top: calc(var(--header-height) + 20px);
+            position: fixed;
+            height: 100vh;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(102, 192, 244, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: rgba(102, 192, 244, 0.2);
+            border-left: 3px solid var(--accent);
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 16px;
+            color: var(--accent);
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 10px 20px;
+        }
+
+        /* Konten Utama */
+        .main-content {
+            flex: 1;
+            margin-left: var(--nav-width);
+            padding: calc(var(--header-height) + 20px) 20px 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        .view-all {
+            color: var(--accent);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Game Carousel */
+        .game-carousel {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .game-carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .game-carousel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .game-carousel::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        .featured-game {
+            min-width: 616px;
+            height: 250px;
+            border-radius: 4px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-game::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+        }
+
+        .game-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+        }
+
+        .game-title {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .game-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .game-tag {
+            background-color: rgba(102, 192, 244, 0.2);
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+
+        .game-price {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .discount {
+            background-color: #4c6b22;
+            color: #a4d007;
+            padding: 2px 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .final-price {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Game Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background-color: var(--secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-card-image {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+        }
+
+        .game-card-content {
+            padding: 15px;
+        }
+
+        .game-card-title {
+            font-size: 14px;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .game-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .game-card-tag {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 10px;
+        }
+
+        .game-card-price {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .game-card-final-price {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .add-to-cart {
+            background-color: var(--button-green);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 2px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .add-to-cart:hover {
+            background-color: var(--button-green-hover);
+        }
+
+        /* Friends Activity */
+        .friends-activity {
+            background-color: var(--secondary);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .activity-text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .activity-text a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .activity-text a:hover {
+            text-decoration: underline;
+        }
+
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .join-button {
+            background-color: var(--button-blue);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 2px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .join-button:hover {
+            background-color: var(--button-blue-hover);
+        }
+
+        /* Responsif */
+        @media (max-width: 1200px) {
+            .search-bar {
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .search-bar {
+                max-width: 300px;
+            }
+            
+            .wallet {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 10px;
+            }
+            
+            .logo h1 {
+                display: none;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 10px 0 0;
+                max-width: 100%;
+            }
+            
+            .sidebar {
+                width: 60px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .nav-item i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+            
+            .featured-game {
+                min-width: 90vw;
+            }
+        }
+    </style>
+    <!-- Menggunakan Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <img src="https://store.akamai.steamstatic.com/public/shared/images/header/logo_steam.svg?t=962016" alt="Steam Logo">
+                <h1>STEAM</h1>
+            </div>
+            
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search">
+            </div>
+            
+            <div class="user-menu">
+                <div class="wallet">$25.67</div>
+                <div class="username">GameMaster</div>
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Avatar" class="user-avatar">
+            </div>
+        </header>
+
+        <!-- Sidebar Navigasi -->
+        <nav class="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-store"></i>
+                    <span>Store</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Community</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Library</span>
+                </li>
+                
+                <li class="nav-divider"></li>
+                
+                <li class="nav-item">
+                    <i class="fas fa-comment-alt"></i>
+                    <span>Chat</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Friends</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News</span>
+                </li>
+                
+                <li class="nav-divider"></li>
+                
+                <li class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Konten Utama -->
+        <main class="main-content">
+            <!-- Featured Games -->
+            <section>
+                <div class="section-header">
+                    <h2 class="section-title">Featured & Recommended</h2>
+                    <div class="view-all">View all</div>
+                </div>
+                
+                <div class="game-carousel">
+                    <div class="featured-game" style="background-image: url('https://cdn.akamai.steamstatic.com/steam/apps/292030/header.jpg?t=1693328492')">
+                        <div class="game-info">
+                            <h3 class="game-title">The Witcher 3: Wild Hunt</h3>
+                            <div class="game-tags">
+                                <span class="game-tag">RPG</span>
+                                <span class="game-tag">Open World</span>
+                                <span class="game-tag">Story Rich</span>
+                            </div>
+                            <div class="game-price">
+                                <span class="discount">-70%</span>
+                                <span class="original-price">$39.99</span>
+                                <span class="final-price">$11.99</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="featured-game" style="background-image: url('https://cdn.akamai.steamstatic.com/steam/apps/1174180/header.jpg?t=1695140956')">
+                        <div class="game-info">
+                            <h3 class="game-title">Red Dead Redemption 2</h3>
+                            <div class="game-tags">
+                                <span class="game-tag">Open World</span>
+                                <span class="game-tag">Western</span>
+                                <span class="game-tag">Adventure</span>
+                            </div>
+                            <div class="game-price">
+                                <span class="discount">-50%</span>
+                                <span class="original-price">$59.99</span>
+                                <span class="final-price">$29.99</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- New Releases -->
+            <section>
+                <div class="section-header">
+                    <h2 class="section-title">New Releases</h2>
+                    <div class="view-all">View all</div>
+                </div>
+                
+                <div class="game-grid">
+                    <div class="game-card">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1086940/header.jpg?t=1695751371" alt="Baldur's Gate 3" class="game-card-image">
+                        <div class="game-card-content">
+                            <h4 class="game-card-title">Baldur's Gate 3</h4>
+                            <div class="game-card-tags">
+                                <span class="game-card-tag">RPG</span>
+                                <span class="game-card-tag">Adventure</span>
+                            </div>
+                            <div class="game-card-price">
+                                <span class="game-card-final-price">$59.99</span>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-card">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1811260/header.jpg?t=1695418427" alt="Starfield" class="game-card-image">
+                        <div class="game-card-content">
+                            <h4 class="game-card-title">Starfield</h4>
+                            <div class="game-card-tags">
+                                <span class="game-card-tag">Sci-fi</span>
+                                <span class="game-card-tag">Open World</span>
+                            </div>
+                            <div class="game-card-price">
+                                <span class="game-card-final-price">$69.99</span>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-card">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1245620/header.jpg?t=1694724876" alt="Elden Ring" class="game-card-image">
+                        <div class="game-card-content">
+                            <h4 class="game-card-title">Elden Ring</h4>
+                            <div class="game-card-tags">
+                                <span class="game-card-tag">Souls-like</span>
+                                <span class="game-card-tag">Open World</span>
+                            </div>
+                            <div class="game-card-price">
+                                <span class="game-card-final-price">$59.99</span>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-card">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/1675180/header.jpg?t=1692285279" alt="Diablo IV" class="game-card-image">
+                        <div class="game-card-content">
+                            <h4 class="game-card-title">Diablo IV</h4>
+                            <div class="game-card-tags">
+                                <span class="game-card-tag">Action RPG</span>
+                                <span class="game-card-tag">Dark Fantasy</span>
+                            </div>
+                            <div class="game-card-price">
+                                <span class="game-card-final-price">$69.99</span>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-card">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/990080/header.jpg?t=1695062095" alt="Hogwarts Legacy" class="game-card-image">
+                        <div class="game-card-content">
+                            <h4 class="game-card-title">Hogwarts Legacy</h4>
+                            <div class="game-card-tags">
+                                <span class="game-card-tag">Adventure</span>
+                                <span class="game-card-tag">Open World</span>
+                            </div>
+                            <div class="game-card-price">
+                                <span class="game-card-final-price">$59.99</span>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Friends Activity -->
+            <section>
+                <div class="section-header">
+                    <h2 class="section-title">Friends Activity</h2>
+                    <div class="view-all">View all</div>
+                </div>
+                
+                <div class="friends-activity">
+                    <ul class="activity-list">
+                        <li class="activity-item">
+                            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Friend" class="friend-avatar">
+                            <div class="activity-text">
+                                <a href="#">CyberPunk77</a> is now playing <a href="#">Cyberpunk 2077</a>
+                            </div>
+                            <div class="activity-time">2 hrs ago</div>
+                            <button class="join-button">Join Game</button>
+                        </li>
+                        
+                        <li class="activity-item">
+                            <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Friend" class="friend-avatar">
+                            <div class="activity-text">
+                                <a href="#">GameQueen</a> is now playing <a href="#">Stardew Valley</a>
+                            </div>
+                            <div class="activity-time">4 hrs ago</div>
+                            <button class="join-button">Join Game</button>
+                        </li>
+                        
+                        <li class="activity-item">
+                            <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="Friend" class="friend-avatar">
+                            <div class="activity-text">
+                                <a href="#">ShooterPro</a> purchased <a href="#">Call of Duty: Modern Warfare II</a>
+                            </div>
+                            <div class="activity-time">6 hrs ago</div>
+                        </li>
+                        
+                        <li class="activity-item">
+                            <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Friend" class="friend-avatar">
+                            <div class="activity-text">
+                                <a href="#">RPGMaster</a> unlocked an achievement in <a href="#">The Witcher 3: Wild Hunt</a>
+                            </div>
+                            <div class="activity-time">1 day ago</div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
